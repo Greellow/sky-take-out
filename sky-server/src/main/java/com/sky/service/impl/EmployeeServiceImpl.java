@@ -1,17 +1,21 @@
 package com.sky.service.impl;
 
 import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import org.apache.commons.codec.cli.Digest;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -65,7 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public void save(EmployeeDTO employeeDTO) {
-        System.out.println("当前的线程id" + Thread.currentThread().getId());
+        //System.out.println("当前的线程id" + Thread.currentThread().getId());
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
         employee.setStatus(StatusConstant.ENABLE);
@@ -76,6 +81,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(employee);
+    }
+
+    /**
+     * 分页查询
+     *
+     * @param dto
+     * @return
+     */
+    public PageResult pageQuery(EmployeePageQueryDTO dto) {
+        PageHelper.startPage(dto.getPage(),dto.getPageSize());
+        Page<Employee> page = employeeMapper.pageQuery(dto);
+        long total = page.getTotal();
+        List<Employee> records = page.getResult();
+
+        return new PageResult(total,records);
     }
 
 }
