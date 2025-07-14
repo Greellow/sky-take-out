@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface EmployeeMapper {
+    
 
     /**
      * 根据用户名查询员工
@@ -28,4 +29,7 @@ public interface EmployeeMapper {
     Page<Employee> pageQuery(EmployeePageQueryDTO dto);
 
     void update(Employee emp);
+
+    @Select("select * from employee where id = #{id}")
+    Employee getById(Long id);
 }
