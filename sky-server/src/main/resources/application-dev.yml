@@ -7,8 +7,14 @@ sky:
     username: root
     password: 1008611asd
 
-    alioss:
-      endpoint: oss-cn-beijing.aliyuncs.com
-      access-key-id: LTAI5t8xQd7HBmmaruW1hCJT
-      access-key-secret: YLlHOb1LAksoCgc0gv0eNXFBXUH4KM
-      bucket-name: green-5522
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: LTAI5t8xQd7HBmmaruW1hCJT
+    access-key-secret: YLlHOb1LAksoCgc0gv0eNXFBXUH4KM
+    bucket-name: green-5522
+
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 10
