@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -19,6 +20,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,6 +47,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
     @Autowired
     OrderDetailMapper orderDetailMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Transactional
     public OrderSubmitVO submitOrder(OrdersSubmitDTO dto) {
@@ -87,6 +93,14 @@ public class OrderServiceImpl implements OrderService {
         shoppingCartMapper.deleteByUserId(userId);
 
         //封装返回结果
+
+//        Map map = new HashMap();
+//        map.put("type", 1);//消息类型，1表示来单提醒
+//        map.put("orderId", order.getId());
+//        map.put("content", "订单号：" + order.getNumber());
+//
+//        //通过WebSocket实现来单提醒，向客户端浏览器推送消息
+//        webSocketServer.sendToAllClient(JSON.toJSONString(map));
 
         OrderSubmitVO vo = OrderSubmitVO.builder().
                             id(order.getId())
@@ -138,6 +152,7 @@ public class OrderServiceImpl implements OrderService {
      */
     public void paySuccess(String outTradeNo) {
         // 当前登录用户id
+        //log.info("--------ssss--------------------ss--------------------------------------------");
         Long userId = BaseContext.getCurrentId();
 
         // 根据订单号查询当前用户的订单
@@ -152,6 +167,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        Map map = new HashMap();
+        map.put("type", 1);//消息类型，1表示来单提醒
+        map.put("orderId", orders.getId());
+        map.put("content", "订单号：" + outTradeNo);
+
+        //通过WebSocket实现来单提醒，向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
 
     public PageResult pageQuery4User(int pageNum, int pageSize, Integer status) {
