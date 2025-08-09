@@ -59,5 +59,5 @@ public interface SetmealMapper {
             "where sd.setmeal_id = #{setmealId}")
     List<DishItemVO> getDishItemBySetmealId(Long setmealId);
 
-    Integer countByMap(Map map);
+    Integer countByMap(java.util.Map map);
 }
